@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+xmlns:mvc="http://www.springframework.org/schema/mvc" xmlns:context="http://www.springframework.org/schema/context"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:tx="http://www.springframework.org/schema/tx"
+xmlns:security="http://www.springframework.org/schema/security"
+xmlns:beans="http://www.springframework.org/schema/beans"
+xsi:schemaLocation="http://www.springframework.org/schema/beans
+http://www.springframework.org/schema/beans/spring-beans.xsd
+http://www.springframework.org/schema/mvc
+http://www.springframework.org/schema/mvc/spring-mvc.xsd
+http://www.springframework.org/schema/context
+http://www.springframework.org/schema/context/spring-context.xsd
+http://www.springframework.org/schema/security
+http://www.springframework.org/schema/security/spring-security.xsd">
+
+
+    <!--  adding the security to the URL -->
+    <!--  /index.jsp -->
+    <!--  http://localhost:8080/.../home -->
+    <!--  http://...../getAllBooks -->
+    <!--  http://..../admin/book/add -->
+    
+     <security:http auto-config="true">
+        
+        <security:intercept-url pattern="/admin/book/*" access="hasRole('ROLE_ADMIN')"  />
+    <security:intercept-url pattern="/get*/**" access="hasAnyRole('ROLE_ADMIN','ROLE_USER')"/>        
+        <security:form-login login-page="/login"
+                             default-target-url="/"
+                             login-processing-url="/perform_login" 
+                             authentication-failure-url="/login"
+                             username-parameter="username" 
+                             password-parameter="password" />
+                             
+        <security:logout logout-url="/perform_logout"
+invalidate-session="true" logout-success-url="/login" />
+
+<security:csrf disabled="true" />
+
+
+        
+</security:http>
+
+    <security:authentication-manager>
+        <security:authentication-provider>
+            <security:jdbc-user-service
+                    data-source-ref="dataSource"
+                    authorities-by-username-query="SELECT username, role FROM userCredential WHERE username = ?"
+                    users-by-username-query="SELECT username, password, enabled FROM userDetail WHERE username = ?" />
+        </security:authentication-provider>
+    </security:authentication-manager>
+    
+</beans:beans>
+    
